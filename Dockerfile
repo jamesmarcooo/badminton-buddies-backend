@@ -2,7 +2,7 @@ FROM python:3.12-alpine3.17
 
 # tells python that you don't want to buffer the output
 # output will be printed directly and immediately as running
-ENV PYTHOHNNUNBUFFERED 1
+ENV PYTHONUNBUFFERED 1
 
 COPY ./requirements.txt /tmp/requirements.txt
 COPY ./requirements.dev.txt /tmp/requirements.dev.txt
@@ -34,5 +34,5 @@ RUN python -m venv /py && \
 # run python from the environment
 ENV PATH="/py/bin:$PATH"
 
-# switch to user and everything being ran in the image is through the djang-user
+# switch to user and everything being ran in the image is through the django-user
 USER django-user

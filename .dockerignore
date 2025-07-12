@@ -2,7 +2,7 @@
 .git
 .gitignore
 
-# DockerAdd commentMore actions
+#Docker: ignore Docker-related files
 .docker
 
 # Python
