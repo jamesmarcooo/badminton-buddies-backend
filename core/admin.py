@@ -47,3 +47,7 @@ class UserAdmin(BaseUserAdmin):
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Player)
+admin.site.register(PlayerSeasonStat)
+admin.site.register(Season)
+admin.site.register(Game)
+admin.site.register(Queue)
