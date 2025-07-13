@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     # apps
     'core',
     'account',
-    # 'app.api',
+    'game',
 
     # DRF
     'rest_framework',
