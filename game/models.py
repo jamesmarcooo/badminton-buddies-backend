@@ -104,7 +104,7 @@ class Game(models.Model):
     # --- Game Metadata ---
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True, null=True)
-    game_date = models.DateField(auto_now=True, db_index=True)
+    game_date = models.DateField(auto_now_add=True, db_index=True)
     season = models.ForeignKey(Season,
         on_delete=models.CASCADE,
         related_name="games",
