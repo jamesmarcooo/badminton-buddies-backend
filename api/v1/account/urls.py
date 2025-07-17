@@ -2,7 +2,6 @@ from django.urls import path
 
 from api.v1.account import views
 
-
 app_name = "account"
 
 urlpatterns = [
