@@ -1,0 +1,98 @@
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"  # Underscore-prefixed
+exclude = [
+  ".ruff_cache",
+  ".venv",
+  "__pypackages__",
+  "node_modules",
+  "venv",
+  "*/migrations",
+]
+extend-select = [
+  "A",
+  "ANN",
+  "ARG",
+  "B",
+  "BLE",
+  "C4",
+  "COM",
+  "D",
+  "DJ",
+  "DTZ",
+  "E",
+  "EM",
+  "ERA",
+  "EXE",
+  "F",
+  "FBT",
+  "G",
+  "I",
+  "ICN",
+  "INP",
+  "INT",
+  "ISC",
+  "N",
+  "NPY",
+  "PD",
+  "PGH",
+  "PIE",
+  "PL",
+  "PT",
+  "PYI",
+  "Q",
+  "RET",
+  "RSE",
+  "RUF",
+  "S",
+  "SLF",
+  "SIM",
+  "T20",
+  "TCH",
+  "TID",
+  "UP",
+  "YTT",
+]
+ignore = [
+  "ANN002",  # Type annotation for *args
+  "ANN003",  # Type annotation for **kwargs
+  "ANN101",  # Type annotation for self
+  "ANN102",  # Type annotation for cls
+  "ANN206",  # Return type annotation for classmethod
+  "ANN401",  # Dynamically typed expressions
+  "EM101",  # Exception string literal
+  "ERA001",  # Commented-out code
+  "D100",  # Docstring in public module
+  "D101",  # Docstring in public class
+  "D102",  # Docstring in public method
+  "D103",  # Docstring in public function
+  "D104",  # Docstring in public package
+  "D105",  # Docstring in magic method
+  "D106",  # Docstring in public nested class
+  "D107",  # Docstring in __init__ method
+  "D203",  # Incompatible with D211
+  "D213",  # Incompatible with D212
+  "PD011",  # Use `.to_numpy()` instead of `.values`
+  "PLR0913",  # Too many arguments to function call
+  "RET501",  # Explicit 'return None'
+  "RUF005",  # Concatenation through spread (with overhead)
+  "RUF012",  # Mutable class attribute annotation
+  "S311",  # Pseudo-random generators
+  "SIM105",  # contextlib.supress over try-except-pass (with overhead)
+  "SIM110",  # any() over for loop (with overhead)
+  "T203",  # pprint()
+  "TCH001",  # Move first-party import xyz into a type-checking block
+  "TCH002",  # Move third-party import xyz into a type-checking block
+  "TCH003",  # Move standard import xyz into a type-checking block
+  "TID252",  # Relative import from parent module
+]
+line-length = 88
+show-fixes = true
+target-version = "py38"
+
+[per-file-ignores]
+"tests/**.py" = [
+  "PT009",  # Unittest-style assertion
+  "S101",  # Use of assert
+]
+
+[isort]
+lines-between-types = 1
