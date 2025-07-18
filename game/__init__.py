@@ -4,7 +4,7 @@ class CourtChoice:
 
     CHOICES = [
         (COURT_A, "A"),
-        (COURT_B, "B")
+        (COURT_B, "B"),
     ]
 
 
