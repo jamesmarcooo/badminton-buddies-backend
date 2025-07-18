@@ -1,6 +1,8 @@
-from django.db import models
+from typing import Any
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.db import models
 
 from account.models import Player
 from game import CourtChoice, GameType
@@ -19,28 +21,29 @@ class Season(models.Model):
 
     class Meta:
         indexes = [
-            models.Index(fields=['start_date', 'end_date']),
+            models.Index(fields=["start_date", "end_date"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
 class PlayerSeasonStat(models.Model):
-    """
-    Stores a player's aggregated statistics for a specific season.
+    """Stores a player's aggregated statistics for a specific season.
+
     This table is updated whenever a relevant game is logged.
     """
+
     # --- Core Relationships ---
     player = models.ForeignKey(
         Player,
         on_delete=models.CASCADE,
-        related_name='season_stats'
+        related_name="season_stats",
     )
     season = models.ForeignKey(
         Season,
         on_delete=models.CASCADE,
-        related_name='player_stats'
+        related_name="player_stats",
     )
 
     # --- Calculated Statistics ---
@@ -63,16 +66,16 @@ class PlayerSeasonStat(models.Model):
     # --- Additional Calculated Fields ---
     best_partner = models.ForeignKey(
         Player,
-        related_name='best_partner_for',
+        related_name="best_partner_for",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        help_text="The player with whom this player has the highest win rate."
+        help_text="The player with whom this player has the highest win rate.",
     )
     odl_rank = models.IntegerField(
         null=True,
         blank=True,
-        help_text="Special rank for a One Day League event."
+        help_text="Special rank for a One Day League event.",
     )
 
     # --- Timestamps ---
@@ -80,19 +83,16 @@ class PlayerSeasonStat(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ('player', 'season')
-        ordering = ['-win_rate', '-wins']
+        unique_together = ("player", "season")
+        ordering = ["-win_rate", "-wins"]
         indexes = [
-            models.Index(fields=['player', 'season']),
+            models.Index(fields=["player", "season"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Stats for {self.player.name} in {self.season.name}"
 
-    def save(self, *args, **kwargs):
-        """
-        Overrides the save method to automatically calculate the win_rate.
-        """
+    def save(self, *args: Any, **kwargs: Any) -> None:
         if self.total_games > 0:
             self.win_rate = (self.wins / self.total_games) * 100
         else:
@@ -158,10 +158,14 @@ class Game(models.Model):
     )
     team2_is_winner = models.BooleanField()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.get_game_type_display()} Game on {self.game_date}"
 
-    def clean(self):
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        self.clean()
+        super().save(*args, **kwargs)
+
+    def clean(self) -> None:
         #Rule 1: Ensure there is exactly one winner.
         if self.team1_is_winner == self.team2_is_winner:
             raise ValidationError("A game must have exactly one winning team.")
@@ -172,7 +176,7 @@ class Game(models.Model):
                 self.player1_team1,
                 self.player2_team1,
                 self.player1_team2,
-                self.player2_team2
+                self.player2_team2,
             ]):
                 raise ValidationError("Doubles games require four players.")
             players = {
@@ -181,7 +185,8 @@ class Game(models.Model):
                 self.player1_team2,
                 self.player2_team2,
             }
-            if len(players) != 4:
+            expected_doubles_players = 4
+            if len(players) != expected_doubles_players:
                 raise ValidationError(
                     "Doubles games must involve four unique players.",
                 )
@@ -192,21 +197,13 @@ class Game(models.Model):
                 )
             if self.player1_team1 == self.player1_team2:
                 raise ValidationError(
-                    "Singles games must involve two unique players."
+                    "Singles games must involve two unique players.",
                 )
-
-    def save(self, *args, **kwargs):
-        """
-        Override the save method to automatically run validation.
-        """
-        self.clean()
-        super().save(*args, **kwargs)
 
 
 class Queue(models.Model):
-    """
-    The order is determined by the 'created_on' timestamp (first-in, first-out).
-    """
+    """Queue model for managing game queues."""
+
     # --- Queue Entry Details ---
     court = models.CharField(
         max_length=1,
@@ -227,12 +224,12 @@ class Queue(models.Model):
     # --- Players in the Team ---
     player1 = models.ForeignKey(
         Player,
-        related_name='queue_as_player1',
-        on_delete=models.CASCADE
+        related_name="queue_as_player1",
+        on_delete=models.CASCADE,
     )
     player2 = models.ForeignKey(
         Player,
-        related_name='queue_as_player2',
+        related_name="queue_as_player2",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
@@ -242,31 +239,29 @@ class Queue(models.Model):
         ordering = ["created_at"]
         indexes = [
             models.Index(
-                fields=["court", "game_type", "created_at"]
-            )
+                fields=["court", "game_type", "created_at"],
+            ),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         team_name = self.player1.name
         if self.player2:
             team_name += f" & {self.player2.name}"
         return f"Team '{team_name}' waiting for Court {self.get_court_display()}"
 
-    def clean(self):
-        """
-        Validation for the queue entry.
-        """
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        self.clean()
+        super().save(*args, **kwargs)
+
+    def clean(self) -> None:
         if self.game_type == GameType.DOUBLES and not self.player2:
             raise ValidationError(
-                "A doubles team in the queue must have two players."
+                "A doubles team in the queue must have two players.",
             )
         if self.game_type == GameType.SINGLES and self.player2:
             raise ValidationError(
-                "A singles team in the queue must have only one player."
+                "A singles team in the queue must have only one player.",
             )
         if self.game_type == GameType.DOUBLES and self.player1 == self.player2:
             raise ValidationError("The two players in a team must be unique.")
 
-    def save(self, *args, **kwargs):
-        self.clean()
-        super().save(*args, **kwargs)
